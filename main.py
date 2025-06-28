@@ -7,15 +7,24 @@ import pymysql
 import requests
 from bs4 import BeautifulSoup as bs
 from bs4 import NavigableString
+from dotenv import load_dotenv
+import os
 
+#=======================================================================
+#取得環境變數
+USER = os.getenv("MYSQLUSER")
+PASSWORD = os.getenv("MYSQLPASSWORD")
+HOST = os.getenv("MYSQLHOST")
+PORT = os.getenv("MYSQLPORT")
+DATABASE = os.getenv("MYSQLDATABASE")
+#=======================================================================
+#api
 app = FastAPI()
-USER = "root"
-PASSWORD = "FYDGhQBvnTqlGfWGJRZAWGczjPdnQWRZ"
-HOST = "gondola.proxy.rlwy.net"
-PORT = 52507
-DATABASE = "GJun"
+#=======================================================================
+#session
 KEY = "ticket_key"
 app.add_middleware(SessionMiddleware,secret_key=KEY)
+#=======================================================================
 
 def convert_TupleToList(data):
     return list(map(lambda _:list(_),data))
