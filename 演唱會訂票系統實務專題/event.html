@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>選單頁面</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    /* 🔹上方按鈕區 */
+    .top-button-group {
+      display: flex;
+      justify-content: flex-start;
+      margin: 20px;
+      gap: 10px;
+    }
+
+    .top-button {
+      background-color: #e0e0e0;
+      padding: 15px 25px;
+      border: none;
+      font-size: 16px;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 3px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .top-button.active {
+      background-color: #004080;
+      color: white;
+    }
+
+    .top-button:hover {
+      background-color: #0050aa;
+      color: white;
+    }
+
+    .alert-box {
+      background-color: #ffe5e5;
+      border-left: 5px solid red;
+      padding: 10px 15px;
+      margin: 15px 20px;
+      color: #cc0000;
+      font-size: 14px;
+    }
+
+    /* 🔹下方選單區 */
+    .menu {
+      background: linear-gradient(to right, #0066CC, #0055AA);
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    .menu-item {
+      color: white;
+      padding: 15px 20px;
+      cursor: pointer;
+    }
+
+    .menu-item.active {
+      background-color: #004499;
+      border-bottom: 3px solid white;
+    }
+
+    .menu-item:hover {
+      background-color: #004499;
+    }
+
+    .content-area {
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🔹新增區塊：上方按鈕 -->
+  <div class="top-button-group">
+    <div class="top-button active">立即購票</div>
+    <div class="top-button">購票流程<br>僅供參考</div>
+    <div class="top-button">取票流程<br>僅供參考</div>
+    <div class="top-button">退票申請表</div>
+  </div>
+
+  <!-- 🔹警示說明 -->
+  <div class="alert-box">
+    <p>➤ 欲購票者，需先成功加入會員及手機號碼驗證，驗證成功後才可開始購票，請提早完成手機驗證，以免影響購票。（手機號碼僅限首次加入會員者需要驗證。）</p>
+  </div>
+
+  <!-- 🔹原本選單 -->
+  <div class="menu">
+    <div class="menu-item" id="intro">節目介紹</div>
+    <div class="menu-item" id="note">注意事項</div>
+    <div class="menu-item" id="buy-note">購票提醒</div>
+    <div class="menu-item" id="get-note">取票提醒</div>
+    <div class="menu-item" id="refund-note">退票說明</div>
+  </div>
+
+  <div class="content-area" id="content"></div>
+
+  <script>
+    // 🔹上方按鈕切換 active 樣式
+    function top_button_click_effect() {
+      const buttons = document.querySelectorAll('.top-button');
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          buttons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        });
+      });
+    }
+
+    // 🔹下方選單切換 active 樣式
+    function active() {
+      const menuItems = document.querySelectorAll('.menu-item');
+      menuItems.forEach(item => {
+        item.addEventListener('click', () => {
+          menuItems.forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
+        });
+      });
+    }
+
+    // 🔹取得內容資訊
+    async function get_hot_event() {
+      let hot_event = new URLSearchParams(window.location.search);
+      hot_event = hot_event.get("hot_event");
+      hot_event = JSON.parse(hot_event);
+
+      let response = await fetch("/hot_event/informations", {
+        method: "POST",
+        body: JSON.stringify(hot_event)
+      });
+      response = await response.json();
+      console.log(response);
+
+      function content(ID) {
+        const content = response[ID];
+        const div = document.getElementById("content");
+        div.innerHTML = "";
+        for (let i = 0; i < content.length; i++) {
+          const p = document.createElement("p");
+          p.textContent = content[i];
+          div.appendChild(p);
+        }
+      }
+
+      document.getElementById("intro").onclick = function () { content("intro"); };
+      document.getElementById("note").onclick = function () { content("note"); };
+      document.getElementById("buy-note").onclick = function () { content("buy-note"); };
+      document.getElementById("get-note").onclick = function () { content("get-note"); };
+      document.getElementById("refund-note").onclick = function () { content("refund-note"); };
+    }
+
+    // 🔹啟動所有功能
+    function __init__() {
+      top_button_click_effect();
+      active();
+      get_hot_event();
+    }
+
+    __init__();
+  </script>
+
+</body>
+</html>
